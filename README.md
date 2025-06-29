@@ -56,7 +56,7 @@ Export all your sales performance data and summaries into a clean **PDF report**
 - **AI Layer:** OpenAI GPT API
 - **PDF Export:** jsPDF
 
-##📸 Core App Screens
+## 📸 Core App Screens
 ✅ Sales KPIs Dashboard
 ![image](https://github.com/user-attachments/assets/36036369-5764-4c27-894e-abc30d0112a4)
 
@@ -77,7 +77,7 @@ Export all your sales performance data and summaries into a clean **PDF report**
 ![image](https://github.com/user-attachments/assets/8bffb040-1352-4792-a5e0-aff5273e396e)
 
 
-##🎯 Ideal Use Case
+## 🎯 Ideal Use Case
 ✅ Sales Teams
 ✅ Sales Managers
 ✅ Business Development Reps
