@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Market News{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4 text-center fw-bold" style="color: white;">📰 Latest Market News (Business)</h2>
+
+    {% if news_list %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for news in news_list %}
+                <div class="col">
+                    <div class="card h-100 shadow-lg rounded-4 glass-card">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title mb-2 fw-semibold text-white">{{ news.title }}</h5>
+                            <p class="card-text text-light flex-grow-1" style="font-size: 0.95rem;">
+                                {{ news.description or "No description available." }}
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
+                            <small class="text-light">Source: {{ news.source }}</small>
+                            <a href="{{ news.url }}" target="_blank" class="btn btn-outline-light btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center shadow-sm">
+            No market news available at the moment. Please check back later.
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #1c1c1c, #343434);
+        min-height: 100vh;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-outline-light:hover {
+        background-color: white;
+        color: #212529;
+    }
+
+    .card-title, .card-text, .text-light {
+        color: #f1f1f1;
+    }
+</style>
+{% endblock %}

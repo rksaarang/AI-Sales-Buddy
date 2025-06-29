@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+ 
+{% block title %}Login{% endblock %}
+ 
+{% block content %}
+<!-- Splash Screen -->
+<div id="splash-screen" class="d-flex justify-content-center align-items-center"
+     style="position: fixed; inset: 0; background-color: #000; z-index: 1050; transition: opacity 0.5s;">
+    <img src="{{ url_for('static', filename='images/68620cbb147f932a1588812aa384fd18.gif') }}"
+         alt="Loading..." style="max-height: 500px;">
+</div>
+ 
+<!-- Login Form (Initially Hidden) -->
+<div id="login-form" class="container py-5" style="display: none; opacity: 0; transition: opacity 0.8s ease-in-out;">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow rounded-4 border-0">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center mb-4">Welcome Back</h3>
+                    <form method="POST" action="{{ url_for('login') }}">
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+                            <label for="email">Email address</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                            <label for="password">Password</label>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill">Login</button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+<!-- JavaScript to Handle Splash Timeout -->
+<script>
+    window.onload = function () {
+        setTimeout(() => {
+            const splash = document.getElementById("splash-screen");
+            const loginForm = document.getElementById("login-form");
+ 
+            // Fade out splash
+            splash.style.opacity = 0;
+            splash.style.pointerEvents = "none";
+ 
+            // After fade-out ends
+            setTimeout(() => {
+                splash.style.display = "none";
+                loginForm.style.display = "block";
+ 
+                // Slight delay before fading in form
+                setTimeout(() => {
+                    loginForm.style.opacity = 1;
+                }, 50);
+            }, 500);
+        }, 4000); // 8 seconds splash duration
+    };
+</script>
+{% endblock %}
+ 
+ 

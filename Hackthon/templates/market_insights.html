@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Market & Industry Insights{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #0f2027;
+    background: linear-gradient(90deg, #2c5364, #203a43, #0f2027);
+    color: #e0e6f1;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+  }
+
+  h1 {
+    font-weight: 600;
+    color: #89c9ff;
+    margin-bottom: 10px;
+  }
+
+  p.lead {
+    color: #a0b2d1;
+    margin-bottom: 40px;
+  }
+
+  .card {
+    background: #1c2533;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    padding: 30px;
+  }
+
+  .btn-primary {
+    background: #3a8dff;
+    border: none;
+    padding: 10px 24px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+  }
+  .btn-primary:hover {
+    background: #0055ff;
+  }
+
+  input.form-control {
+    background: #121e2d;
+    border: none;
+    border-radius: 15px 0 0 15px;
+    color: #e0e6f1;
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+  input.form-control::placeholder {
+    color: #8a9bb8;
+  }
+
+  /* Card header style */
+  .card-header {
+    background: #2a3950;
+    border-radius: 12px 12px 0 0;
+    padding: 15px 30px;
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: #89c9ff;
+  }
+
+  /* Insights content styling */
+  #companyAnalysis {
+    color: #cfd6e8;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    max-height: 550px;
+    overflow-y: auto;
+  }
+
+  #companyAnalysis h5 {
+    color: #3a8dff;
+    font-weight: 700;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #3a8dff;
+    padding-bottom: 6px;
+  }
+
+  #companyAnalysis h6 {
+    color: #89c9ff;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  #companyAnalysis ul {
+    padding-left: 1.4rem;
+    margin-bottom: 15px;
+  }
+
+  #companyAnalysis li {
+    margin-bottom: 6px;
+  }
+
+  /* Scrollbar styling */
+  #companyAnalysis::-webkit-scrollbar {
+    width: 8px;
+  }
+  #companyAnalysis::-webkit-scrollbar-thumb {
+    background-color: #3a8dff;
+    border-radius: 10px;
+  }
+  #companyAnalysis::-webkit-scrollbar-track {
+    background: #121e2d;
+  }
+
+</style>
+
+<div class="container">
+  <h1>Market & Industry Insights</h1>
+  <p class="lead">AI-powered market insights and trends analysis</p>
+
+  <div class="card mb-5">
+    <div class="input-group">
+      <input
+        type="text"
+        id="companySearch"
+        class="form-control"
+        placeholder="Search for a company..."
+        autocomplete="off"
+      />
+      <button class="btn btn-primary" type="button" onclick="searchCompany()">Search</button>
+    </div>
+  </div>
+
+  <div id="companyInsights" style="display:none;">
+    <div class="card">
+      <div class="card-header" id="companyName">Company Insights</div>
+      <div class="card-body" id="companyAnalysis">
+        <p class="text-center" style="color:#8a9bb8;">Loading company insights...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    function formatCompanyInsights(data) {
+      return `
+        <div>
+          <h5>${data.title || "Company Analysis"}</h5>
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Latest Developments</h6>
+              <ul>
+                ${
+                  data.latest_developments?.length
+                    ? data.latest_developments.map(dev => `<li>${dev}</li>`).join('')
+                    : '<li>No developments found.</li>'
+                }
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6>Market Position</h6>
+              <p>${data.market_position || "No market position data available."}</p>
+            </div>
+          </div>
+
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <h6>Competitors</h6>
+              <ul>
+                ${
+                  data.competitors?.length
+                    ? data.competitors.map(comp => `<li>${comp}</li>`).join('')
+                    : '<li>No competitors data available.</li>'
+                }
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6>Recent Trends</h6>
+              <ul>
+                ${
+                  data.trends?.length
+                    ? data.trends.map(trend => `<li>${trend}</li>`).join('')
+                    : '<li>No trends found.</li>'
+                }
+              </ul>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <h6>Business Opportunities & Challenges</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <h6 style="color:#28a745;">Opportunities</h6>
+                <ul>
+                  ${
+                    data.opportunities?.length
+                      ? data.opportunities.map(op => `<li>${op}</li>`).join('')
+                      : '<li>No opportunities available.</li>'
+                  }
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6 style="color:#dc3545;">Challenges</h6>
+                <ul>
+                  ${
+                    data.challenges?.length
+                      ? data.challenges.map(chal => `<li>${chal}</li>`).join('')
+                      : '<li>No challenges available.</li>'
+                  }
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    window.searchCompany = async function() {
+      const companyName = document.getElementById('companySearch').value.trim();
+      if (!companyName) {
+        alert('Please enter a company name.');
+        return;
+      }
+
+      try {
+        const analysisDiv = document.getElementById('companyAnalysis');
+        analysisDiv.innerHTML = '<p style="color:#8a9bb8; text-align:center;">Loading insights...</p>';
+        document.getElementById('companyInsights').style.display = 'block';
+
+        const response = await fetch(`/api/company-insights/${encodeURIComponent(companyName)}`);
+        const data = await response.json();
+
+        if (data.error) {
+          analysisDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          return;
+        }
+
+        document.getElementById('companyName').textContent = `${companyName} Insights`;
+        analysisDiv.innerHTML = formatCompanyInsights(data);
+      } catch (error) {
+        console.error('Error fetching company insights:', error);
+        document.getElementById('companyAnalysis').innerHTML = `<div class="alert alert-danger">Failed to fetch company insights. Please try again later.</div>`;
+      }
+    }
+  });
+</script>
+{% endblock %}

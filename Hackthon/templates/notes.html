@@ -1,0 +1,1145 @@
+{% extends "base.html" %}
+ 
+{% block title %}Sales Notes{% endblock %}
+ 
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<style>
+  :root {
+    --primary-blue: #1e293b;
+    --secondary-blue: #334155;
+    --accent-blue: #3b82f6;
+    --light-accent: #60a5fa;
+    --success-green: #10b981;
+    --warning-orange: #f59e0b;
+    --danger-red: #ef4444;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --border-color: rgba(148, 163, 184, 0.2);
+    --card-bg: rgba(30, 41, 59, 0.8);
+    --input-bg: rgba(51, 65, 85, 0.6);
+    --hover-bg: rgba(59, 130, 246, 0.1);
+    --chat-user-bg: linear-gradient(135deg, var(--accent-blue), var(--light-accent));
+    --chat-bot-bg: var(--input-bg);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* Header Styles */
+  .page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+  
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-blue), var(--light-accent));
+    border-radius: 2px;
+  }
+
+  .page-title {
+    font-size: 2.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    letter-spacing: -0.02em;
+  }
+  
+  .page-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+    font-weight: 400;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Layout Grid */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 450px 1fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  
+  @media (max-width: 1200px) {
+    .main-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  /* Card Styles */
+  .card {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .chat-card {
+    position: sticky;
+    top: 2rem;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Section Headers */
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .section-header .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--light-accent));
+    border-radius: 10px;
+    margin-right: 1rem;
+    font-size: 1.125rem;
+    color: white;
+  }
+  
+  .section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* Chat Interface Styles */
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+    max-height: calc(70vh - 200px);
+  }
+
+  .chat-messages::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: var(--accent-blue);
+    border-radius: 3px;
+  }
+  
+  .chat-messages::-webkit-scrollbar-track {
+    background: var(--input-bg);
+    border-radius: 3px;
+  }
+
+  .message {
+    margin-bottom: 1rem;
+    animation: fadeInUp 0.3s ease-out;
+  }
+
+  .message-bot {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .message-user {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  .message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+  }
+
+  .bot-avatar {
+    background: linear-gradient(135deg, var(--accent-blue), var(--light-accent));
+    color: white;
+    margin-right: 0.75rem;
+  }
+
+  .user-avatar {
+    background: var(--success-green);
+    color: white;
+    margin-left: 0.75rem;
+  }
+
+  .message-content {
+    max-width: 80%;
+    padding: 0.875rem 1.125rem;
+    border-radius: 18px;
+    position: relative;
+    word-wrap: break-word;
+  }
+
+  .message-bot .message-content {
+    background: var(--chat-bot-bg);
+    color: var(--text-secondary);
+    border-bottom-left-radius: 6px;
+  }
+
+  .message-user .message-content {
+    background: var(--chat-user-bg);
+    color: white;
+    border-bottom-right-radius: 6px;
+  }
+
+  .message-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+    text-align: right;
+  }
+
+  .message-bot .message-time {
+    text-align: left;
+  }
+
+  /* Chat Input Area */
+  .chat-input-area {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+  }
+
+  .chat-input-container {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+  }
+
+  .chat-input {
+    flex: 1;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+    font-size: 0.925rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    resize: none;
+    max-height: 120px;
+    min-height: 44px;
+  }
+
+  .chat-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    background: rgba(51, 65, 85, 0.8);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .chat-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .send-button {
+    background: linear-gradient(135deg, var(--accent-blue), var(--light-accent));
+    border: none;
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .send-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.25);
+  }
+
+  .send-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Option Buttons - Now inside message bubbles */
+  .option-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .option-button {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: var(--accent-blue);
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .option-button:hover {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: white;
+    transform: translateX(4px);
+  }
+
+  .option-button::after {
+    content: '→';
+    font-size: 1rem;
+    transition: transform 0.2s ease;
+  }
+
+  .option-button:hover::after {
+    transform: translateX(2px);
+  }
+
+  /* Quick reply suggestions */
+  .quick-replies {
+    margin-top: 0.75rem;
+  }
+
+  .quick-reply-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  .quick-reply-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+
+  .quick-reply-button {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: var(--accent-blue);
+    padding: 0.375rem 0.75rem;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .quick-reply-button:hover {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: white;
+    transform: scale(1.05);
+  }
+
+  /* Progress Indicator */
+  .progress-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: var(--success-green);
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(16, 185, 129, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--success-green);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  /* Notes List Styles - keeping original styles */
+  .notes-list {
+    max-height: 700px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+  
+  .notes-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .notes-list::-webkit-scrollbar-thumb {
+    background: var(--accent-blue);
+    border-radius: 3px;
+  }
+  
+  .notes-list::-webkit-scrollbar-track {
+    background: var(--input-bg);
+    border-radius: 3px;
+  }
+
+  /* Note Item Styles - keeping original styles */
+  .note-item {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+  }
+  
+  .note-item:hover {
+    background: rgba(51, 65, 85, 0.8);
+    border-color: var(--accent-blue);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .note-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .note-title::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--light-accent));
+    border-radius: 2px;
+    margin-right: 0.75rem;
+  }
+
+  .note-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+  }
+  
+  .meta-item i {
+    width: 16px;
+    margin-right: 0.5rem;
+    color: var(--accent-blue);
+  }
+  
+  .meta-item strong {
+    color: var(--text-secondary);
+    margin-right: 0.5rem;
+  }
+
+  .note-content {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    background: rgba(15, 23, 42, 0.6);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent-blue);
+    margin-bottom: 1rem;
+  }
+
+  /* Badge Styles */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .badge i {
+    margin-right: 0.375rem;
+    font-size: 0.75rem;
+  }
+  
+  .badge-proposal {
+    background: var(--success-green);
+    color: white;
+  }
+  
+  .badge-no-proposal {
+    background: var(--text-muted);
+    color: white;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-muted);
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+  
+  .empty-state h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+  }
+  
+  .empty-state p {
+    font-size: 0.925rem;
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    background: var(--chat-bot-bg);
+    border-radius: 18px;
+    border-bottom-left-radius: 6px;
+    margin-left: 2.5rem;
+  }
+
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+  }
+
+  .typing-dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes typing {
+    0%, 60%, 100% {
+      transform: translateY(0);
+      opacity: 0.4;
+    }
+    30% {
+      transform: translateY(-10px);
+      opacity: 1;
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .container {
+      padding: 1rem;
+    }
+    
+    .page-title {
+      font-size: 2rem;
+    }
+    
+    .card {
+      padding: 1.5rem;
+    }
+    
+    .note-meta {
+      grid-template-columns: 1fr;
+    }
+    
+    .main-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .chat-card {
+      position: static;
+      height: 60vh;
+    }
+
+    .main-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+    }
+
+    .main-grid .chat-card {
+      order: 1;
+    }
+
+    .main-grid > .card:not(.chat-card) {
+      order: 2;
+    }
+  }
+</style>
+
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">Sales Notes</h1>
+    <p class="page-subtitle">Professional client relationship management and sales tracking</p>
+  </div>
+
+  <div class="main-grid">
+    <!-- Chat Interface Card -->
+    <div class="card chat-card">
+      <div class="section-header">
+        <div class="icon">
+          <i class="fas fa-comments"></i>
+        </div>
+        <h2>Add New Note</h2>
+      </div>
+      
+      <div class="chat-container">
+        <div id="progressIndicator" class="progress-indicator" style="display: none;">
+          <i class="fas fa-tasks"></i>
+          <span id="progressText">Question 1 of 6</span>
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div id="chatMessages" class="chat-messages">
+          <div class="message message-bot">
+            <div class="message-avatar bot-avatar">
+              <i class="fas fa-robot"></i>
+            </div>
+            <div class="message-content">
+              Hi! I'm here to help you create a new sales note. Let's start with the basics - what would you like to title this note?
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <div class="chat-input-container">
+            <textarea id="chatInput" class="chat-input" placeholder="Type your response..." rows="1"></textarea>
+            <button id="sendButton" class="send-button">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden form to submit data -->
+      <form id="hiddenForm" method="POST" style="display: none;">
+        <input type="hidden" name="title" id="hiddenTitle">
+        <input type="hidden" name="client_name" id="hiddenClientName">
+        <input type="hidden" name="sector" id="hiddenSector">
+        <input type="hidden" name="region" id="hiddenRegion">
+        <input type="hidden" name="sales_estimated" id="hiddenSalesEstimated">
+        <input type="hidden" name="content" id="hiddenContent">
+        <input type="hidden" name="proposal_given" id="hiddenProposalGiven">
+      </form>
+    </div>
+    
+    <!-- Notes List Card -->
+    <div class="card">
+      <div class="section-header">
+        <div class="icon">
+          <i class="fas fa-clipboard-list"></i>
+        </div>
+        <h2>Recent Notes</h2>
+      </div>
+      
+      <div class="notes-list">
+        {% for note in notes %}
+          <div class="note-item">
+            <div class="note-title">{{ note.title }}</div>
+            
+            <div class="note-meta">
+              <div class="meta-item">
+                <i class="fas fa-building"></i>
+                <strong>Client:</strong> {{ note.client_name }}
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-industry"></i>
+                <strong>Sector:</strong> {{ note.sector }}
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <strong>Region:</strong> {{ note.region }}
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-calendar"></i>
+                <strong>Date:</strong> {{ note.created_at.strftime('%b %d, %Y') }}
+              </div>
+              {% if note.sales_estimated %}
+              <div class="meta-item">
+                <i class="fas fa-dollar-sign"></i>
+                <strong>Est. Sales:</strong> ${{ "{:,.0f}".format(note.sales_estimated) }}
+              </div>
+              {% endif %}
+              {% if note.sentiment %}
+              <div class="meta-item">
+                <i class="fas fa-chart-line"></i>
+                <strong>Sentiment:</strong> {{ note.sentiment }}
+              </div>
+              {% endif %}
+            </div>
+            
+            <div class="note-content">{{ note.content }}</div>
+            
+            <div class="badge {% if note.proposal_given %}badge-proposal{% else %}badge-no-proposal{% endif %}">
+              {% if note.proposal_given %}
+                <i class="fas fa-check-circle"></i> Proposal Given
+              {% else %}
+                <i class="fas fa-clock"></i> No Proposal Yet
+              {% endif %}
+            </div>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <i class="fas fa-sticky-note"></i>
+            <h3>No Notes Yet</h3>
+            <p>Start by adding your first sales note using the chat interface. Track your client meetings, proposals, and follow-ups all in one professional interface.</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+class SalesNotesChat {
+  constructor() {
+    this.currentStep = 0;
+    this.formData = {};
+    this.questions = [
+      {
+        type: 'text',
+        field: 'title',
+        question: 'What would you like to title this note?',
+        placeholder: 'Enter a descriptive title',
+        required: true
+      },
+      {
+        type: 'text',
+        field: 'client_name',
+        question: 'What\'s the client company name?',
+        placeholder: 'Enter client company name',
+        required: true
+      },
+      {
+        type: 'select',
+        field: 'sector',
+        question: 'Which industry sector does this client belong to?',
+        options: [
+          'Technology',
+          'Healthcare',
+          'Retail & E-commerce',
+          'Real Estate',
+          'BFSI',
+          'Non-Profit'
+        ],
+        required: true
+      },
+      {
+        type: 'select',
+        field: 'region',
+        question: 'Which region is this client located in?',
+        options: [
+          'North',
+          'South',
+          'East',
+          'West',
+          'International'
+        ],
+        required: true
+      },
+      {
+        type: 'number',
+        field: 'sales_estimated',
+        question: 'What\'s the estimated sales amount in USD? (Optional - enter 0 to skip)',
+        placeholder: 'Enter amount in USD',
+        required: false
+      },
+      {
+        type: 'textarea',
+        field: 'content',
+        question: 'Please provide the detailed meeting notes, key discussion points, and action items:',
+        placeholder: 'Enter detailed meeting notes...',
+        required: true
+      },
+      {
+        type: 'boolean',
+        field: 'proposal_given',
+        question: 'Was a proposal given to the client during this meeting?',
+        options: ['Yes', 'No'],
+        required: true
+      }
+    ];
+    
+    this.initializeElements();
+    this.setupEventListeners();
+    this.showProgress();
+  }
+
+  initializeElements() {
+    this.chatMessages = document.getElementById('chatMessages');
+    this.chatInput = document.getElementById('chatInput');
+    this.sendButton = document.getElementById('sendButton');
+    this.optionButtons = document.getElementById('optionButtons');
+    this.progressIndicator = document.getElementById('progressIndicator');
+    this.progressText = document.getElementById('progressText');
+    this.progressFill = document.getElementById('progressFill');
+    this.hiddenForm = document.getElementById('hiddenForm');
+  }
+
+  setupEventListeners() {
+    this.sendButton.addEventListener('click', () => this.handleSend());
+    this.chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        this.handleSend();
+      }
+    });
+    
+    this.chatInput.addEventListener('input', () => this.adjustTextareaHeight());
+  }
+
+  adjustTextareaHeight() {
+    this.chatInput.style.height = 'auto';
+    this.chatInput.style.height = Math.min(this.chatInput.scrollHeight, 120) + 'px';
+  }
+
+  showProgress() {
+    this.progressIndicator.style.display = 'flex';
+    this.progressText.textContent = `Question ${this.currentStep + 1} of ${this.questions.length}`;
+    const progressPercent = ((this.currentStep) / this.questions.length) * 100;
+    this.progressFill.style.width = progressPercent + '%';
+  }
+
+  addMessage(content, isUser = false, showTyping = false, options = null) {
+    if (showTyping) {
+      this.showTypingIndicator();
+      setTimeout(() => {
+        this.hideTypingIndicator();
+        this.addMessage(content, isUser, false, options);
+      }, 1000 + Math.random() * 1000);
+      return;
+    }
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isUser ? 'message-user' : 'message-bot'}`;
+    
+    const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    let optionsHtml = '';
+    if (options && options.length > 0) {
+      if (options.length <= 3) {
+        // Show as quick reply buttons for Yes/No or small lists
+        optionsHtml = `
+          <div class="quick-replies">
+            <div class="quick-reply-label">Quick Replies:</div>
+            <div class="quick-reply-buttons">
+              ${options.map(option => `
+                <button class="quick-reply-button" data-option="${option}">
+                  ${option}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        // Show as larger option buttons for longer lists
+        optionsHtml = `
+          <div class="option-buttons">
+            ${options.map(option => `
+              <button class="option-button" data-option="${option}">
+                ${option}
+              </button>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
+    
+    messageDiv.innerHTML = `
+      <div class="message-avatar ${isUser ? 'user-avatar' : 'bot-avatar'}">
+        <i class="fas ${isUser ? 'fa-user' : 'fa-robot'}"></i>
+      </div>
+      <div class="message-content">
+        ${content}
+        ${optionsHtml}
+        <div class="message-time">${time}</div>
+      </div>
+    `;
+    
+    this.chatMessages.appendChild(messageDiv);
+    
+    // Add event listeners to option buttons
+    if (options && options.length > 0) {
+      const optionButtons = messageDiv.querySelectorAll('.option-button, .quick-reply-button');
+      optionButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const selectedOption = button.getAttribute('data-option');
+          this.handleOptionClick(selectedOption);
+          // Disable all option buttons in this message
+          optionButtons.forEach(btn => {
+            btn.style.opacity = '0.5';
+            btn.style.pointerEvents = 'none';
+          });
+          // Highlight the selected button
+          button.style.opacity = '1';
+          button.style.background = 'var(--accent-blue)';
+          button.style.color = 'white';
+        });
+      });
+    }
+    
+    this.scrollToBottom();
+  }
+
+  showTypingIndicator() {
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'typing-indicator';
+    typingDiv.id = 'typingIndicator';
+    typingDiv.innerHTML = `
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    `;
+    this.chatMessages.appendChild(typingDiv);
+    this.scrollToBottom();
+  }
+
+  hideTypingIndicator() {
+    const typingIndicator = document.getElementById('typingIndicator');
+    if (typingIndicator) {
+      typingIndicator.remove();
+    }
+  }
+
+  scrollToBottom() {
+    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+  }
+
+  showOptions(options, callback) {
+    // This method is no longer needed as options are now embedded in messages
+    // Keeping for backward compatibility
+  }
+
+  hideOptions() {
+    // This method is no longer needed as options are now embedded in messages
+    // Keeping for backward compatibility
+  }
+
+  handleOptionClick(selectedOption) {
+    const currentQuestion = this.questions[this.currentStep];
+    
+    // Add user message
+    this.addMessage(selectedOption, true);
+    
+    // Validate and store response
+    if (this.validateResponse(selectedOption, currentQuestion)) {
+      this.formData[currentQuestion.field] = this.processResponse(selectedOption, currentQuestion);
+      this.currentStep++;
+      
+      if (this.currentStep < this.questions.length) {
+        this.askNextQuestion();
+      } else {
+        this.completeForm();
+      }
+    }
+  }
+
+  handleSend() {
+    const input = this.chatInput.value.trim();
+    if (!input && this.questions[this.currentStep].type !== 'select' && this.questions[this.currentStep].type !== 'boolean') return;
+
+    const currentQuestion = this.questions[this.currentStep];
+    
+    // Add user message
+    this.addMessage(input, true);
+    this.chatInput.value = '';
+    this.adjustTextareaHeight();
+
+    // Validate and store response
+    if (this.validateResponse(input, currentQuestion)) {
+      this.formData[currentQuestion.field] = this.processResponse(input, currentQuestion);
+      this.currentStep++;
+      
+      if (this.currentStep < this.questions.length) {
+        this.askNextQuestion();
+      } else {
+        this.completeForm();
+      }
+    } else {
+      this.addMessage('Please provide a valid response for this field.', false, true);
+    }
+  }
+
+  validateResponse(input, question) {
+    if (question.required && !input) return false;
+    
+    if (question.type === 'number' && input) {
+      const num = parseFloat(input);
+      return !isNaN(num) && num >= 0;
+    }
+    
+    if (question.type === 'select' && input) {
+      return question.options.includes(input);
+    }
+    
+    if (question.type === 'boolean' && input) {
+      return ['yes', 'no', 'y', 'n'].includes(input.toLowerCase());
+    }
+    
+    return true;
+  }
+
+  processResponse(input, question) {
+    if (question.type === 'number') {
+      return input ? parseFloat(input) : 0;
+    }
+    
+    if (question.type === 'boolean') {
+      return ['yes', 'y'].includes(input.toLowerCase());
+    }
+    
+    return input;
+  }
+
+  askNextQuestion() {
+    this.showProgress();
+    const question = this.questions[this.currentStep];
+    
+    setTimeout(() => {
+      if (question.type === 'select' || question.type === 'boolean') {
+        this.addMessage(question.question, false, true, question.options);
+      } else {
+        this.addMessage(question.question, false, true);
+        // For text inputs, also update the placeholder
+        setTimeout(() => {
+          this.chatInput.placeholder = question.placeholder || 'Type your response...';
+        }, 1500);
+      }
+    }, 500);
+  }
+
+  completeForm() {
+    this.progressText.textContent = 'Complete!';
+    this.progressFill.style.width = '100%';
+    
+    this.addMessage('Perfect! I have all the information needed. Let me save this note for you...', false, true);
+    
+    setTimeout(() => {
+      // Populate hidden form
+      document.getElementById('hiddenTitle').value = this.formData.title || '';
+      document.getElementById('hiddenClientName').value = this.formData.client_name || '';
+      document.getElementById('hiddenSector').value = this.formData.sector || '';
+      document.getElementById('hiddenRegion').value = this.formData.region || '';
+      document.getElementById('hiddenSalesEstimated').value = this.formData.sales_estimated || '';
+      document.getElementById('hiddenContent').value = this.formData.content || '';
+      document.getElementById('hiddenProposalGiven').value = this.formData.proposal_given ? 'on' : '';
+      
+      // Submit the form
+      this.hiddenForm.submit();
+    }, 2000);
+  }
+
+  reset() {
+    this.currentStep = 0;
+    this.formData = {};
+    this.chatMessages.innerHTML = `
+      <div class="message message-bot">
+        <div class="message-avatar bot-avatar">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="message-content">
+          Hi! I'm here to help you create a new sales note. Let's start with the basics - what would you like to title this note?
+        </div>
+      </div>
+    `;
+    this.showProgress();
+    this.chatInput.placeholder = 'Enter a descriptive title';
+  }
+}
+
+// Initialize the chat when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+  new SalesNotesChat();
+});
+</script>
+
+{% endblock %}

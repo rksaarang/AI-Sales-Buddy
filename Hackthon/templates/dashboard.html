@@ -1,0 +1,726 @@
+{% extends "base.html" %}
+ 
+{% block title %}Dashboard{% endblock %}
+ 
+{% block content %}
+<!-- Import Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+ 
+<style>
+  :root {
+    --primary-color: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary-color: #f8fafc;
+    --accent-color: #06d6a0;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+ 
+  .dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .dashboard-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .dashboard-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .dashboard-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .stat-card {
+    background: var(--bg-primary);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  }
+
+  .stat-card.clients::before {
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  }
+
+  .stat-card.visits::before {
+    background: linear-gradient(90deg, #06d6a0, #10b981);
+  }
+
+  .stat-card.proposals::before {
+    background: linear-gradient(90deg, #f59e0b, #f97316);
+  }
+
+  .stat-card.sales::before {
+    background: linear-gradient(90deg, #ef4444, #f43f5e);
+  }
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+  }
+
+  .stat-icon.clients {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  }
+
+  .stat-icon.visits {
+    background: linear-gradient(135deg, #06d6a0, #10b981);
+  }
+
+  .stat-icon.proposals {
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+  }
+
+  .stat-icon.sales {
+    background: linear-gradient(135deg, #ef4444, #f43f5e);
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .stat-value {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0.5rem 0;
+  }
+
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .chart-card {
+    background: var(--bg-primary);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .chart-card:hover {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .chart-header {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .chart-title-section {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .chart-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+  }
+
+  .chart-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  .chart-controls {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .chart-type-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .chart-type-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+
+  .chart-type-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .chart-container {
+    position: relative;
+    height: 320px;
+    width: 100%;
+  }
+
+  .download-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+  }
+
+  .download-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, var(--primary-dark), #3730a3);
+  }
+
+  .download-btn:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-container {
+      padding: 1rem;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .charts-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .stat-card, .chart-card {
+      padding: 1.5rem;
+    }
+
+    .dashboard-title {
+      font-size: 1.875rem;
+    }
+
+    .stat-value {
+      font-size: 1.875rem;
+    }
+
+    .chart-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .chart-controls {
+      justify-content: flex-start;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .charts-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .chart-card {
+      min-width: unset;
+    }
+
+    .chart-controls {
+      flex-direction: column;
+    }
+
+    .chart-type-btn {
+      justify-content: center;
+    }
+  }
+</style>
+ 
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Sales Dashboard</h1>
+        <p class="dashboard-subtitle">Comprehensive overview of your sales performance and analytics</p>
+    </div>
+ 
+    <div class="stats-grid">
+        <div class="stat-card clients">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-label">Total Clients</div>
+                    <div class="stat-value">{{ total_clients }}</div>
+                </div>
+                <div class="stat-icon clients">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card visits">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-label">Total Visits</div>
+                    <div class="stat-value">{{ total_visits }}</div>
+                </div>
+                <div class="stat-icon visits">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card proposals">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-label">Proposals Given</div>
+                    <div class="stat-value">{{ total_proposals }}</div>
+                </div>
+                <div class="stat-icon proposals">
+                    <i class="fas fa-file-contract"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card sales">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-label">Total Sales</div>
+                    <div class="stat-value">${{ "%.2f"|format(total_sales) }}</div>
+                </div>
+                <div class="stat-icon sales">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title-section">
+                    <h3 class="chart-title">Sector Distribution</h3>
+                    <p class="chart-subtitle">Breakdown of visits by industry sector</p>
+                </div>
+                <div class="chart-controls">
+                    <button class="chart-type-btn active" data-chart="sector" data-type="doughnut">
+                        <i class="fas fa-circle"></i> Doughnut
+                    </button>
+                    <button class="chart-type-btn" data-chart="sector" data-type="bar">
+                        <i class="fas fa-chart-bar"></i> Bar
+                    </button>
+                    <button class="chart-type-btn" data-chart="sector" data-type="pie">
+                        <i class="fas fa-chart-pie"></i> Pie
+                    </button>
+                    <button class="chart-type-btn" data-chart="sector" data-type="polarArea">
+                        <i class="fas fa-chart-area"></i> Polar
+                    </button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="sectorChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title-section">
+                    <h3 class="chart-title">Regional Performance</h3>
+                    <p class="chart-subtitle">Geographic distribution of client visits</p>
+                </div>
+                <div class="chart-controls">
+                    <button class="chart-type-btn active" data-chart="region" data-type="doughnut">
+                        <i class="fas fa-circle"></i> Doughnut
+                    </button>
+                    <button class="chart-type-btn" data-chart="region" data-type="bar">
+                        <i class="fas fa-chart-bar"></i> Bar
+                    </button>
+                    <button class="chart-type-btn" data-chart="region" data-type="pie">
+                        <i class="fas fa-chart-pie"></i> Pie
+                    </button>
+                    <button class="chart-type-btn" data-chart="region" data-type="line">
+                        <i class="fas fa-chart-line"></i> Line
+                    </button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="regionChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title-section">
+                    <h3 class="chart-title">Client Sentiment</h3>
+                    <p class="chart-subtitle">Overall satisfaction and feedback analysis</p>
+                </div>
+                <div class="chart-controls">
+                    <button class="chart-type-btn active" data-chart="sentiment" data-type="doughnut">
+                        <i class="fas fa-circle"></i> Doughnut
+                    </button>
+                    <button class="chart-type-btn" data-chart="sentiment" data-type="bar">
+                        <i class="fas fa-chart-bar"></i> Bar
+                    </button>
+                    <button class="chart-type-btn" data-chart="sentiment" data-type="pie">
+                        <i class="fas fa-chart-pie"></i> Pie
+                    </button>
+                    <button class="chart-type-btn" data-chart="sentiment" data-type="radar">
+                        <i class="fas fa-chart-area"></i> Radar
+                    </button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="sentimentChart"></canvas>
+            </div>
+        </div>
+    </div>
+ 
+    <div class="download-section">
+        <button id="downloadBtn" class="download-btn">
+            <i class="fas fa-download"></i>
+            Download Sales Report
+        </button>
+    </div>
+</div>
+ 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+ 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let chartInstances = {};
+    let chartData = {};
+
+    fetch('/api/analytics')
+    .then(response => response.json())
+    .then(data => {
+        // Store chart data
+        chartData = {
+            sector: {
+                labels: data.sector_counts.map(item => item.sector),
+                data: data.sector_counts.map(item => item.count)
+            },
+            region: {
+                labels: data.region_counts.map(item => item.region),
+                data: data.region_counts.map(item => item.count)
+            },
+            sentiment: {
+                labels: Object.keys(data.sentiments),
+                data: Object.values(data.sentiments)
+            }
+        };
+
+        // Modern color palettes
+        const colorPalettes = {
+            sector: ['#6366f1', '#8b5cf6', '#06d6a0', '#f59e0b', '#ef4444', '#3b82f6', '#10b981'],
+            region: ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6', '#6366f1', '#3b82f6'],
+            sentiment: ['#10b981', '#f59e0b', '#ef4444']
+        };
+
+        // Chart.js default options
+        const getDefaultOptions = (type) => {
+            const baseOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: type === 'bar' || type === 'line' ? 'top' : 'bottom',
+                        labels: {
+                            color: '#64748b',
+                            font: {
+                                family: 'Inter',
+                                size: 12,
+                                weight: '500'
+                            },
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            };
+
+            if (type === 'doughnut' || type === 'pie') {
+                baseOptions.cutout = type === 'doughnut' ? '65%' : '0%';
+            }
+
+            if (type === 'bar') {
+                baseOptions.scales = {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f1f5f9'
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: {
+                                family: 'Inter',
+                                size: 11
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: {
+                                family: 'Inter',
+                                size: 11
+                            }
+                        }
+                    }
+                };
+            }
+
+            if (type === 'line') {
+                baseOptions.scales = {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f1f5f9'
+                        },
+                        ticks: {
+                            color: '#64748b'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#64748b'
+                        }
+                    }
+                };
+                baseOptions.elements = {
+                    line: {
+                        tension: 0.4
+                    },
+                    point: {
+                        radius: 6,
+                        hoverRadius: 8
+                    }
+                };
+            }
+
+            if (type === 'radar') {
+                baseOptions.scales = {
+                    r: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f1f5f9'
+                        },
+                        pointLabels: {
+                            color: '#64748b',
+                            font: {
+                                family: 'Inter',
+                                size: 11
+                            }
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            backdropColor: 'transparent'
+                        }
+                    }
+                };
+            }
+
+            return baseOptions;
+        };
+
+        // Function to create/update chart
+        function createChart(chartId, chartType, dataKey) {
+            const ctx = document.getElementById(chartId);
+            const colors = colorPalettes[dataKey];
+            
+            // Destroy existing chart if it exists
+            if (chartInstances[chartId]) {
+                chartInstances[chartId].destroy();
+            }
+
+            const chartConfig = {
+                type: chartType,
+                data: {
+                    labels: chartData[dataKey].labels,
+                    datasets: [{
+                        label: getChartLabel(dataKey),
+                        data: chartData[dataKey].data,
+                        backgroundColor: colors.slice(0, chartData[dataKey].data.length),
+                        borderColor: chartType === 'line' ? colors[0] : colors.slice(0, chartData[dataKey].data.length),
+                        borderWidth: chartType === 'line' ? 3 : 0,
+                        hoverBorderWidth: 3,
+                        hoverBorderColor: '#ffffff',
+                        fill: chartType === 'line' ? false : true
+                    }]
+                },
+                options: getDefaultOptions(chartType)
+            };
+
+            chartInstances[chartId] = new Chart(ctx, chartConfig);
+        }
+
+        function getChartLabel(dataKey) {
+            const labels = {
+                sector: 'Sector-wise Visits',
+                region: 'Region-wise Visits',
+                sentiment: 'Client Sentiments'
+            };
+            return labels[dataKey];
+        }
+
+        // Initialize charts
+        createChart('sectorChart', 'doughnut', 'sector');
+        createChart('regionChart', 'doughnut', 'region');
+        createChart('sentimentChart', 'doughnut', 'sentiment');
+
+        // Chart type button handlers
+        document.querySelectorAll('.chart-type-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const chartName = this.dataset.chart;
+                const chartType = this.dataset.type;
+                const chartId = chartName + 'Chart';
+
+                // Update active button
+                const parentControls = this.parentElement;
+                parentControls.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // Recreate chart with new type
+                createChart(chartId, chartType, chartName);
+            });
+        });
+
+        // PDF Download Logic
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+ 
+            doc.setFontSize(16);
+            doc.text("Sales Summary Report", 20, 20);
+            doc.setFontSize(12);
+ 
+            doc.text(`Total Clients: ${data.total_clients}`, 20, 40);
+            doc.text(`Total Visits: ${data.total_visits}`, 20, 50);
+            doc.text(`Proposals Given: ${data.total_proposals}`, 20, 60);
+            doc.text(`Total Sales: $${data.total_sales.toFixed(2)}`, 20, 70);
+ 
+            doc.text("Sector Counts:", 20, 90);
+            data.sector_counts.forEach((item, index) => {
+                doc.text(`- ${item.sector}: ${item.count}`, 25, 100 + (index * 8));
+            });
+ 
+            let regionStart = 100 + (data.sector_counts.length * 8) + 10;
+            doc.text("Region Counts:", 20, regionStart);
+            data.region_counts.forEach((item, index) => {
+                doc.text(`- ${item.region}: ${item.count}`, 25, regionStart + 10 + (index * 8));
+            });
+ 
+            let sentimentStart = regionStart + 10 + (data.region_counts.length * 8) + 10;
+            doc.text("Sentiments:", 20, sentimentStart);
+            Object.keys(data.sentiments).forEach((key, index) => {
+                doc.text(`- ${key}: ${data.sentiments[key]}`, 25, sentimentStart + 10 + (index * 8));
+            });
+ 
+            doc.save("Sales_Summary_Report.pdf");
+        });
+    });
+});
+</script>
+ 
+{% endblock %}
