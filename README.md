@@ -64,8 +64,13 @@ Export all your sales performance data and summaries into a clean **PDF report**
 ![image](https://github.com/user-attachments/assets/40e05e0a-aeb4-41c3-8acc-0d0108b60a3d)
 ![image](https://github.com/user-attachments/assets/5a353306-56ed-42cb-a23d-c84e73e44df8)
 
+
+
 ✅ Notes Entry Page
+
+
 ![image](https://github.com/user-attachments/assets/a099bec3-dc77-4af2-bbbf-a622fb1fe50e)
+
 
 ✅ Market Insights
 ![image](https://github.com/user-attachments/assets/8b0054af-67e0-4e1f-b5c1-27a1b85a7155)
